@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ИИ-кабинет бухгалтера v1.4: документы в ChatGPT без данных клиентов</title>
+  <meta name="description" content="«ИИ-кабинет бухгалтера» скрывает ИНН, счета, ФИО, адреса и другие данные до отправки текста в нейросеть. Работает офлайн на вашем компьютере. 999 ₽ один раз, обновления бесплатно год.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="ИИ-кабинет бухгалтера">
+<meta property="og:title" content="ИИ-кабинет бухгалтера: документы в ChatGPT без данных клиентов">
+<meta property="og:description" content="«ИИ-кабинет бухгалтера» скрывает ИНН, счета, ФИО, адреса и другие данные до отправки текста в нейросеть. Работает офлайн на вашем компьютере. 999 ₽ один раз, обновления бесплатно год.">
+<meta property="og:url" content="https://stanialav.github.io/ii/">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:,">
+  <style>
+    :root {
+      --bg: #f4f1eb;
+      --bg-deep: #ebe6dd;
+      --paper: #fffcf7;
+      --ink: #1c2328;
+      --muted: #5a646c;
+      --line: #d6d0c6;
+      --accent: #1d4a43;
+      --accent-hover: #163832;
+      --accent-soft: #e4eeeb;
+      --focus: #2a6b61;
+      --radius: 12px;
+      --shadow: 0 1px 2px rgba(28, 35, 40, 0.05), 0 10px 28px rgba(28, 35, 40, 0.06);
+      --max: 44rem;
+      --wide: 58rem;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+    section, h2, details { scroll-margin-top: 4.5rem; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      font-size: 1.0625rem;
+      line-height: 1.65;
+      color: var(--ink);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--accent); }
+    a:hover { color: var(--accent-hover); }
+    a:focus-visible,
+    button:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 3px;
+    }
+
+    .wrap {
+      width: min(100% - 2.5rem, var(--wide));
+      margin-inline: auto;
+    }
+    .narrow { width: min(100%, var(--max)); }
+
+    /* Header */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: #f7f5f0;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .header-inner {
+      width: min(100% - 2.5rem, var(--wide));
+      margin-inline: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      min-height: 4rem;
+    }
+    .brand {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      line-height: 1.2;
+      min-width: 0;
+    }
+    .brand-name {
+      font-weight: 600;
+      font-size: 0.98rem;
+      letter-spacing: -0.01em;
+    }
+    .brand-ver {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-shrink: 0;
+    }
+    .header-contact {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 550;
+    }
+    .header-contact:hover { color: var(--accent); }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.8rem 1.25rem;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.98rem;
+      line-height: 1.25;
+      border: 1.5px solid transparent;
+      transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      color: #fff;
+    }
+    .btn-secondary {
+      background: transparent;
+      color: var(--accent);
+      border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+    }
+    .btn-secondary:hover {
+      background: var(--accent-soft);
+      color: var(--accent-hover);
+    }
+    .btn-lg { padding: 0.95rem 1.4rem; font-size: 1.02rem; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 3.5rem 0 3.25rem;
+    }
+    .hero h1 {
+      margin: 0 0 1.1rem;
+      font-size: clamp(1.7rem, 3.6vw, 2.55rem);
+      line-height: 1.2;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+      max-width: 18ch;
+    }
+    .lede {
+      margin: 0 0 1.75rem;
+      max-width: 40rem;
+      font-size: 1.125rem;
+      color: color-mix(in srgb, var(--ink) 88%, var(--muted));
+    }
+
+    /* Sections */
+    section {
+      padding: 0 0 3.5rem;
+    }
+    h2 {
+      margin: 0 0 1.25rem;
+      font-size: clamp(1.35rem, 2.4vw, 1.65rem);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+    p { margin: 0 0 1rem; }
+    p:last-child { margin-bottom: 0; }
+
+    .panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    /* Pain */
+    .pain-list {
+      margin: 0 0 1.25rem;
+      padding: 0;
+      list-style: none;
+    }
+    .pain-list li {
+      position: relative;
+      padding: 0.9rem 0 0.9rem 1.35rem;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink);
+    }
+    .pain-list li:first-child { padding-top: 0; }
+    .pain-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 1.35rem;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.55;
+    }
+    .pain-list li:first-child::before { top: 0.5rem; }
+    .close {
+      margin: 0;
+      padding: 1.15rem 1.25rem;
+      background: var(--accent-soft);
+      border-radius: 10px;
+      color: var(--ink);
+    }
+
+    /* Steps */
+    .steps {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 800px) {
+      .steps { grid-template-columns: repeat(3, 1fr); }
+    }
+    .step {
+      padding: 1.35rem 1.3rem 1.45rem;
+      height: 100%;
+    }
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2rem;
+      height: 2rem;
+      margin-bottom: 0.85rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+    .step h3 {
+      margin: 0 0 0.55rem;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.98rem;
+    }
+
+    /* Hide list */
+    .hide-list {
+      display: grid;
+      gap: 0 1.5rem;
+      grid-template-columns: 1fr;
+      margin: 0;
+      padding: 1.1rem 1.3rem;
+      list-style: none;
+    }
+    @media (min-width: 860px) {
+      .hide-list { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    .hide-list li {
+      display: block;
+      position: relative;
+      padding: 0.85rem 0 0.85rem 1.45rem;
+      border-bottom: 1px solid var(--line);
+    }
+    .hide-list li:last-child { border-bottom: none; }
+    @media (min-width: 860px) {
+      .hide-list li:nth-last-child(-n+3) { border-bottom: none; }
+    }
+    .hide-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 1.15rem;
+      width: 0.65rem;
+      height: 0.35rem;
+      border-left: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: rotate(-45deg);
+    }
+    .tag {
+      display: inline-block;
+      margin-left: 0.35rem;
+      padding: 0.05rem 0.4rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      vertical-align: 0.08em;
+      white-space: nowrap;
+    }
+
+    /* Benefits */
+    .benefits {
+      display: grid;
+      gap: 0.85rem;
+    }
+    .benefit {
+      padding: 1.1rem 1.25rem;
+    }
+    .benefit h3 {
+      margin: 0 0 0.3rem;
+      font-size: 1.05rem;
+    }
+    .benefit p { margin: 0; color: var(--muted); }
+
+    /* Audience */
+    .audience {
+      margin: 0;
+      padding: 0.4rem 0 0;
+      list-style: none;
+    }
+    .audience li {
+      padding: 0.85rem 0 0.85rem 1.35rem;
+      border-top: 1px solid var(--line);
+      position: relative;
+    }
+    .audience li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 1.3rem;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 2px;
+      background: var(--accent);
+      opacity: 0.45;
+    }
+
+    /* FAQ */
+    .faq {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .faq details {
+      border-bottom: 1px solid var(--line);
+    }
+    .faq details:last-child { border-bottom: none; }
+    .faq summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 1.05rem 2.6rem 1.05rem 1.25rem;
+      font-weight: 600;
+      position: relative;
+    }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after {
+      content: "";
+      position: absolute;
+      right: 1.2rem;
+      top: 50%;
+      width: 0.55rem;
+      height: 0.55rem;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: translateY(-70%) rotate(45deg);
+      transition: transform 0.15s ease;
+    }
+    .faq details[open] summary::after {
+      transform: translateY(-20%) rotate(225deg);
+    }
+    .faq-body {
+      padding: 0 1.25rem 1.15rem;
+      color: var(--muted);
+    }
+    .faq-body p { margin: 0; }
+
+    /* Price & trial */
+    .split {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr;
+    }
+    @media (min-width: 860px) {
+      .split { grid-template-columns: 1.15fr 0.85fr; align-items: stretch; }
+    }
+    .price-card, .trial-card { padding: 1.7rem 1.5rem 1.8rem; }
+    .price {
+      margin: 0 0 0.2rem;
+      font-size: clamp(2rem, 4vw, 2.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .price-sub {
+      margin: 0 0 1.15rem;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    .price-list {
+      margin: 0 0 1.4rem;
+      padding: 0;
+      list-style: none;
+    }
+    .price-list li {
+      position: relative;
+      padding: 0.35rem 0 0.35rem 1.3rem;
+    }
+    .price-list li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.8rem;
+      width: 0.65rem;
+      height: 0.35rem;
+      border-left: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: rotate(-45deg);
+    }
+    .contact-line {
+      margin: 1rem 0 0;
+      font-size: 0.98rem;
+    }
+    .trial-card h2 { margin-bottom: 0.7rem; }
+    .trial-card .actions { margin-top: 1.25rem; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 1.6rem 0 2.2rem;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .footer-inner {
+      width: min(100% - 2.5rem, var(--wide));
+      margin-inline: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 0.6rem 1.5rem;
+    }
+    footer a { font-weight: 600; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    @media (max-width: 639px) {
+      .wrap, .header-inner, .footer-inner {
+        width: min(100% - 1.6rem, var(--wide));
+      }
+      .hero { padding: 2.2rem 0 2.4rem; }
+      .hero h1 { max-width: none; }
+      section { padding-bottom: 2.6rem; }
+      .header-contact { display: none; }
+      .btn-header { padding: 0.62rem 0.9rem; font-size: 0.88rem; }
+      .actions { flex-direction: column; }
+      .actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <a class="brand" href="#top">
+        <span class="brand-name">ИИ-кабинет бухгалтера</span>
+        <span class="brand-ver">Версия 1.4</span>
+      </a>
+      <div class="header-actions">
+        <a class="header-contact" href="https://t.me/FinShield24">Telegram&nbsp;@FinShield24</a>
+        <a class="btn btn-primary btn-header" href="https://t.me/FinShield24?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%98%D0%98-%D0%BA%D0%B0%D0%B1%D0%B8%D0%BD%D0%B5%D1%82%20%D0%B1%D1%83%D1%85%D0%B3%D0%B0%D0%BB%D1%82%D0%B5%D1%80%D0%B0%20%D0%B7%D0%B0%20999%20%E2%82%BD">Купить за 999 ₽</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="wrap">
+      <section class="hero">
+        <div class="narrow">
+          <h1>Отправляйте документы в ChatGPT без данных клиентов</h1>
+          <p class="lede">«ИИ-кабинет бухгалтера» скрывает ИНН, счета, ФИО, адреса и другие данные до того, как вы вставите текст в нейросеть. Работает в браузере на вашем компьютере, без интернета — ничего никуда не загружается.</p>
+          <div class="actions">
+            <a class="btn btn-primary btn-lg" href="https://t.me/FinShield24?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%98%D0%98-%D0%BA%D0%B0%D0%B1%D0%B8%D0%BD%D0%B5%D1%82%20%D0%B1%D1%83%D1%85%D0%B3%D0%B0%D0%BB%D1%82%D0%B5%D1%80%D0%B0%20%D0%B7%D0%B0%20999%20%E2%82%BD">Купить за 999 ₽</a>
+            <a class="btn btn-secondary btn-lg" href="II-kabinet-buhgaltera-trial-v1.4.1.html" download="II-kabinet-buhgaltera-trial-v1.4.1.html">Попробовать пробную версию</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="situation" aria-labelledby="situation-title">
+        <div class="narrow">
+          <h2 id="situation-title">Знакомая ситуация?</h2>
+          <ul class="pain-list">
+            <li>Пришло требование из ФНС, и хочется быстро разобраться в нём с помощью ChatGPT — но в документе ИНН, КПП, расчётные счета и ФИО.</li>
+            <li>Нейросеть отлично помогает с письмами и пояснениями, но вставлять туда клиентские данные страшно: 152-ФЗ, коммерческая тайна, доверие клиента.</li>
+            <li>Вычищать данные вручную долго: пропустишь один телефон или номер счёта — и всё зря.</li>
+            <li>В итоге ИИ либо не используется вовсе, либо используется с тревогой «а вдруг что-то утекло».</li>
+          </ul>
+          <p class="close">«ИИ-кабинет бухгалтера» снимает этот вопрос: нейросеть получает текст, в котором вместо данных стоят метки.</p>
+        </div>
+      </section>
+
+      <section id="how" aria-labelledby="how-title">
+        <h2 id="how-title">Как это работает — 3 шага</h2>
+        <div class="steps">
+          <article class="panel step">
+            <div class="step-num">1</div>
+            <h3>Вставьте или откройте документ</h3>
+            <p>Текст, PDF или XML из ФНС — например, требование налоговой. Файл открывается прямо в программе, на вашем компьютере.</p>
+          </article>
+          <article class="panel step">
+            <div class="step-num">2</div>
+            <h3>Нажмите «скрыть»</h3>
+            <p>Программа заменит данные метками: [ИНН-1], [ТЕЛЕФОН-1], [АДРЕС-1] и так далее. Вы видите результат и можете его проверить. Этот текст и отправляете в ChatGPT или другую нейросеть.</p>
+          </article>
+          <article class="panel step">
+            <div class="step-num">3</div>
+            <h3>Верните данные в ответ ИИ</h3>
+            <p>Вставьте ответ нейросети обратно — программа по своему ключу подставит настоящие значения вместо меток. Ключ остаётся только у вас.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="hides" aria-labelledby="hides-title">
+        <div>
+          <h2 id="hides-title">Что программа скрывает</h2>
+          <ul class="panel hide-list">
+            <li>ИНН, КПП, ОГРН</li>
+            <li>Номера счетов</li>
+            <li>Телефоны, включая добавочные номера после «доб.» и «вн.»</li>
+            <li>Адреса электронной почты</li>
+            <li>ФИО</li>
+            <li>Названия организаций</li>
+            <li>Адреса и почтовые индексы <span class="tag">новое в v1.4</span></li>
+            <li>Номера кабинетов и офисов после «каб.» и «офис»</li>
+            <li>В XML из ФНС — поля вроде «город», «населённый пункт», «район»</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="benefits" aria-labelledby="benefits-title">
+        <div class="narrow">
+          <h2 id="benefits-title">Что вы получаете</h2>
+          <div class="benefits">
+            <article class="panel benefit">
+              <h3>Спокойствие</h3>
+              <p>В нейросеть уходит текст без персональных данных и реквизитов клиентов.</p>
+            </article>
+            <article class="panel benefit">
+              <h3>Работа без интернета</h3>
+              <p>Программа — один HTML-файл. Она открывается в браузере и ничего не отправляет на сторонние серверы.</p>
+            </article>
+            <article class="panel benefit">
+              <h3>Ответ ИИ — сразу с реальными данными</h3>
+              <p>Метки обратно меняются на настоящие значения, не нужно ничего переписывать руками.</p>
+            </article>
+            <article class="panel benefit">
+              <h3>Понимает PDF и XML</h3>
+              <p>Чтение PDF встроено, XML-файлы из ФНС тоже открываются.</p>
+            </article>
+            <article class="panel benefit">
+              <h3>Подсказки по названиям и ФИО</h3>
+              <p>Программа предлагает найденные организации и ФИО в виде подсказок — можно добавить все одной кнопкой «Добавить все».</p>
+            </article>
+            <article class="panel benefit">
+              <h3>Предупреждение, если что-то упущено</h3>
+              <p>Если в тексте нашлись организации, а список названий пуст, программа об этом скажет.</p>
+            </article>
+            <article class="panel benefit">
+              <h3>Вы всегда видите результат перед отправкой</h3>
+              <p>Ничего не уходит в нейросеть без вашего взгляда.</p>
+            </article>
+            <article class="panel benefit">
+              <h3>Один раз и навсегда</h3>
+              <p>999 ₽ разово, без подписки. Обновления в течение года после покупки бесплатны.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="who" aria-labelledby="who-title">
+        <div class="narrow">
+          <h2 id="who-title">Для кого</h2>
+          <ul class="audience">
+            <li>Бухгалтеры, которые ведут нескольких клиентов и хотят использовать ИИ для ответов на требования, писем и разбора документов.</li>
+            <li>ИП, которые сами ведут учёт и общаются с налоговой.</li>
+            <li>Небольшие бухгалтерские фирмы, которым важно не подставить клиентов и соблюдать 152-ФЗ.</li>
+            <li>Все, кто уже пользуется ChatGPT или другой нейросетью, но каждый раз сомневается, можно ли туда вставить документ.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="faq" aria-labelledby="faq-title">
+        <div class="narrow">
+          <h2 id="faq-title">Частые вопросы</h2>
+          <div class="faq panel">
+            <details>
+              <summary>Это безопасно? Куда попадают мои документы?</summary>
+              <div class="faq-body"><p>Никуда. Программа — это один HTML-файл, который открывается в браузере на вашем компьютере. Документы обрабатываются локально и не загружаются ни на какие серверы. Ключ для возврата данных тоже хранится только у вас.</p></div>
+            </details>
+            <details>
+              <summary>Нужен ли интернет?</summary>
+              <div class="faq-body"><p>Нет. Программа работает полностью офлайн. Интернет понадобится только для самой нейросети, куда вы отправите уже обезличенный текст.</p></div>
+            </details>
+            <details>
+              <summary>С какими нейросетями это работает?</summary>
+              <div class="faq-body"><p>С любыми. Программа не подключается к ИИ напрямую: вы копируете обезличенный текст и вставляете его в ChatGPT или любую другую нейросеть, которой пользуетесь. Затем вставляете ответ обратно — и данные возвращаются на место.</p></div>
+            </details>
+            <details>
+              <summary>Подойдёт для Mac и Windows?</summary>
+              <div class="faq-body"><p>Да. Программа открывается в браузере, поэтому ей не нужна установка под конкретную систему — достаточно современного браузера.</p></div>
+            </details>
+            <details>
+              <summary>А если программа что-то пропустит?</summary>
+              <div class="faq-body"><p>Вы всегда видите результат перед отправкой — и это важно. Чаще всего проверить стоит две вещи: адреса без привычных слов-маркеров (ул., д., г. и т. п.) и ФИО без отчества или инициалов — их программа может не распознать. Такие места легко добавить вручную. Плюс программа сама предупредит, если нашла организации, а список названий пуст.</p></div>
+            </details>
+            <details>
+              <summary>Как оплатить и получить программу?</summary>
+              <div class="faq-body"><p>Стоимость 999 ₽, оплата разовая, переводом с банковской карты. Напишите в Telegram <a href="https://t.me/FinShield24">@FinShield24</a>, пришлём реквизиты. После оплаты напишите туда же, и мы отправим файл программы в Telegram.</p></div>
+            </details>
+            <details>
+              <summary>Можно сначала попробовать?</summary>
+              <div class="faq-body"><p>Да, есть пробная версия с ограниченной функциональностью. <a href="II-kabinet-buhgaltera-trial-v1.4.1.html" download="II-kabinet-buhgaltera-trial-v1.4.1.html">Скачайте файл</a> и откройте двойным щелчком в браузере.</p></div>
+            </details>
+            <details>
+              <summary>Будут ли обновления?</summary>
+              <div class="faq-body"><p>Программа развивается: например, в версии 1.4 появилось скрытие адресов, почтовых индексов, добавочных номеров и номеров кабинетов. Обновления в течение года после покупки бесплатны.</p></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="how-to-buy" aria-labelledby="how-to-buy-title">
+        <h2 id="how-to-buy-title">Как купить</h2>
+        <div class="steps">
+          <article class="panel step">
+            <div class="step-num">1</div>
+            <h3>Напишите в Telegram</h3>
+            <p>Откройте чат с <a href="https://t.me/FinShield24">@FinShield24</a> и напишите, что хотите купить программу. Можно нажать кнопку «Купить за 999 ₽»: сообщение подставится само.</p>
+          </article>
+          <article class="panel step">
+            <div class="step-num">2</div>
+            <h3>Получите реквизиты и оплатите</h3>
+            <p>Пришлём реквизиты для перевода с банковской карты. Стоимость 999 ₽, оплата разовая.</p>
+          </article>
+          <article class="panel step">
+            <div class="step-num">3</div>
+            <h3>Получите файл в Telegram</h3>
+            <p>После оплаты напишите туда же, и мы отправим файл полной версии в Telegram.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="buy" aria-labelledby="buy-title">
+        <div class="split">
+          <div class="panel price-card">
+            <h2 id="buy-title">Цена</h2>
+            <p class="price">999 ₽</p>
+            <p class="price-sub">один раз, без подписки</p>
+            <ul class="price-list">
+              <li>Полная версия «ИИ-кабинета бухгалтера» v1.4</li>
+              <li>Работает без интернета, на вашем компьютере</li>
+              <li>Без подписки и ежемесячных платежей</li>
+              <li>Оплата переводом с банковской карты</li>
+              <li>После оплаты файл присылаем в Telegram</li>
+              <li>Обновления в течение года после покупки бесплатны</li>
+            </ul>
+            <div class="actions">
+              <a class="btn btn-primary btn-lg" href="https://t.me/FinShield24?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5%21%20%D0%A5%D0%BE%D1%87%D1%83%20%D0%BA%D1%83%D0%BF%D0%B8%D1%82%D1%8C%20%D0%98%D0%98-%D0%BA%D0%B0%D0%B1%D0%B8%D0%BD%D0%B5%D1%82%20%D0%B1%D1%83%D1%85%D0%B3%D0%B0%D0%BB%D1%82%D0%B5%D1%80%D0%B0%20%D0%B7%D0%B0%20999%20%E2%82%BD">Купить за 999 ₽</a>
+            </div>
+            <p class="contact-line">Вопросы и оплата: <a href="https://t.me/FinShield24">Telegram @FinShield24</a></p>
+          </div>
+          <div class="panel trial-card" id="trial">
+            <h2>Пробная версия</h2>
+            <p>Хотите сначала посмотреть, как это работает? Скачайте файл и откройте двойным щелчком в браузере. Это пробная версия: открыты 8 задач из 50, обезличивание документа работает полностью. Остальные задачи видны с замком 🔒 и открываются в полной версии.</p>
+            <div class="actions">
+              <a class="btn btn-secondary btn-lg" href="II-kabinet-buhgaltera-trial-v1.4.1.html" download="II-kabinet-buhgaltera-trial-v1.4.1.html">Скачать пробную версию</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <span>«ИИ-кабинет бухгалтера» v1.4</span>
+      <span>Связь: <a href="https://t.me/FinShield24">Telegram @FinShield24</a></span>
+    </div>
+  </footer>
+</body>
+</html>
