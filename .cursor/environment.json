@@ -1,0 +1,11 @@
+{
+  "name": "II cabinet",
+  "install": "set -euo pipefail; script=$(find \"$PWD\" \"$PWD/..\" \"$PWD/../..\" /agent /workspace -path '*/.git' -prune -o -path '*/.cursor/install.sh' -type f -print -quit 2>/dev/null || true); if [ -z \"$script\" ]; then echo \"install.sh not found under $PWD\" >&2; exit 1; fi; bash \"$script\"",
+  "start": "set -euo pipefail; script=$(find \"$PWD\" \"$PWD/..\" \"$PWD/../..\" /agent /workspace -path '*/.git' -prune -o -path '*/.cursor/start.sh' -type f -print -quit 2>/dev/null || true); if [ -z \"$script\" ]; then echo \"start.sh not found under $PWD\" >&2; exit 1; fi; exec bash \"$script\"",
+  "ports": [
+    {
+      "name": "web",
+      "port": 8000
+    }
+  ]
+}
